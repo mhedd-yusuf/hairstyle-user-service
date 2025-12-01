@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hairstyle-user-service
+  labels:
+    app: hairstyle-user-service
+spec:
+  type: LoadBalancer  # Creates an AWS ELB for external access
+  selector:
+    app: hairstyle-user-service
+  ports:
+    - name: http
+      port: 80           # External port
+      targetPort: 8080   # Container port
+      protocol: TCP
+  sessionAffinity: None
+
+---
+# Optional: ClusterIP service for internal communication only
+# Uncomment this and comment out the LoadBalancer above if you don't need external access
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: hairstyle-user-service
+#   labels:
+#     app: hairstyle-user-service
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: hairstyle-user-service
+#   ports:
+#   - name: http
+#     port: 8080
+#     targetPort: 8080
+#     protocol: TCP
