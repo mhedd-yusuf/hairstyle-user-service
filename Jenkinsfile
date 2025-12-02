@@ -70,8 +70,13 @@ pipeline {
             steps {
                 echo '🐳 Building Docker image...'
                 script {
-                    docker.build("${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}")
-                    docker.build("${DOCKER_HUB_REPO}/${IMAGE_NAME}:latest")
+                    // Build with --no-cache to force fresh build
+                    sh """
+                        docker build --no-cache \
+                            -t ${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG} \
+                            -t ${DOCKER_HUB_REPO}/${IMAGE_NAME}:latest \
+                            .
+                    """
                 }
             }
         }
@@ -127,8 +132,11 @@ pipeline {
                             kubectl apply -f k8s/deployment.yaml -n ${NAMESPACE}
                             kubectl apply -f k8s/service.yaml -n ${NAMESPACE}
 
+                            # Force restart deployment to pull new image
+                            kubectl rollout restart deployment/${APP_NAME} -n ${NAMESPACE}
+
                             # Wait for rollout to complete
-                            kubectl rollout status deployment/${APP_NAME} -n ${NAMESPACE} --timeout=5m
+                            kubectl rollout status deployment/${APP_NAME} -n ${NAMESPACE} --timeout=10m
                         """
                     }
                 }

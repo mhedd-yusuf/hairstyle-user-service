@@ -19,7 +19,7 @@ spec:
       containers:
         - name: hairstyle-user-service
           image: IMAGE_PLACEHOLDER  # This will be replaced by Jenkins
-          imagePullPolicy: Always
+          imagePullPolicy: Always  # Always pull fresh image, never use cache
           ports:
             - containerPort: 8080
               name: http
@@ -57,20 +57,20 @@ spec:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
-            initialDelaySeconds: 60
+            initialDelaySeconds: 90
             periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 3
+            timeoutSeconds: 5
+            failureThreshold: 5
 
           # Readiness probe - checks if application is ready to serve traffic
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
-            initialDelaySeconds: 30
+            initialDelaySeconds: 60
             periodSeconds: 5
-            timeoutSeconds: 3
-            failureThreshold: 3
+            timeoutSeconds: 5
+            failureThreshold: 5
 
           # Startup probe - for slow-starting applications
           startupProbe:
@@ -79,8 +79,8 @@ spec:
               port: 8080
             initialDelaySeconds: 0
             periodSeconds: 10
-            timeoutSeconds: 3
-            failureThreshold: 30
+            timeoutSeconds: 5
+            failureThreshold: 60
 
       # Restart policy
       restartPolicy: Always
