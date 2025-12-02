@@ -30,8 +30,8 @@ logs/
 spring-boot-*.log
 
 # Kubernetes secrets (IMPORTANT!)
-#k8s/secret.yaml
-#k8s/*-secret.yaml
+k8s/secret.yaml
+k8s/*-secret.yaml
 
 # Environment files
 .env
