@@ -29,14 +29,19 @@ logs/
 # Spring Boot
 spring-boot-*.log
 
-# Kubernetes secrets (IMPORTANT!)
+# Kubernetes secrets (CRITICAL - NEVER COMMIT!)
 k8s/secret.yaml
 k8s/*-secret.yaml
+*secret*.yaml
 
-# Environment files
+# Environment files with credentials
 .env
 .env.local
 *.env
+application-*.yml
+application-*.properties
+!application.yml
+!application.properties
 
 # Terraform
 *.tfstate
@@ -44,8 +49,6 @@ k8s/*-secret.yaml
 .terraform/
 .terraform.lock.hcl
 
-# Application specific
-application-*.yml
-application-*.properties
-!application.yml
-!application.properties
+# Database configuration files
+**/database.yml
+**/db-config.yml

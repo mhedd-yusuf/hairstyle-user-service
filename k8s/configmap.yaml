@@ -13,7 +13,7 @@ data:
 
   # Database configuration (non-sensitive)
   # Replace with your actual RDS endpoint from Terraform outputs
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://springboot-app-postgres.cru06u0a2s19.eu-west-2.rds.amazonaws.com:5432/appdb"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://springboot-app-postgres.xxxxxx.eu-west-2.rds.amazonaws.com:5432/appdb"
   SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
   SPRING_JPA_DATABASE_PLATFORM: "org.hibernate.dialect.PostgreSQLDialect"
 

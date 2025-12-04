@@ -4,7 +4,7 @@ pipeline {
     // Environment variables - customize these
     environment {
         // Docker configuration
-        DOCKER_HUB_REPO = 'eltumerabe'  // Change this
+        DOCKER_HUB_REPO = 'your-dockerhub-username'  // Change this
         IMAGE_NAME = 'hairstyle-user-service'
         IMAGE_TAG = "${BUILD_NUMBER}"
 
@@ -19,6 +19,8 @@ pipeline {
         // Credentials IDs (configured in Jenkins)
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
         AWS_CREDENTIALS = 'aws-credentials'
+        DB_CREDENTIALS = 'rds-database-credentials'  // Database credentials
+        RDS_ENDPOINT = credentials('rds-endpoint')    // RDS endpoint as secret text
     }
 
     stages {
@@ -113,17 +115,26 @@ pipeline {
         stage('Deploy to EKS') {
             steps {
                 echo '🚀 Deploying to EKS cluster...'
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                credentialsId: AWS_CREDENTIALS]]) {
+                withCredentials([
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: AWS_CREDENTIALS],
+                    usernamePassword(credentialsId: DB_CREDENTIALS, usernameVariable: 'DB_USERNAME', passwordVariable: 'DB_PASSWORD')
+                ]) {
                     script {
-                        // Update image tag in deployment
                         sh """
                             # Create namespace if it doesn't exist
                             kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
 
-                            # Apply ConfigMap and Secrets first
+                            # Create/Update Secret with database credentials from Jenkins
+                            echo "Creating Kubernetes secret with database credentials..."
+                            kubectl delete secret ${APP_NAME}-secret -n ${NAMESPACE} --ignore-not-found
+                            kubectl create secret generic ${APP_NAME}-secret \
+                                --from-literal=db-username=\${DB_USERNAME} \
+                                --from-literal=db-password=\${DB_PASSWORD} \
+                                --from-literal=db-url=jdbc:postgresql://\${RDS_ENDPOINT}:5432/appdb \
+                                -n ${NAMESPACE}
+
+                            # Apply ConfigMap (non-sensitive config only)
                             kubectl apply -f k8s/configmap.yaml -n ${NAMESPACE}
-                            kubectl apply -f k8s/secret.yaml -n ${NAMESPACE}
 
                             # Update deployment with new image
                             sed -i 's|IMAGE_PLACEHOLDER|${DOCKER_HUB_REPO}/${IMAGE_NAME}:${IMAGE_TAG}|g' k8s/deployment.yaml
