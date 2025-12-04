@@ -4,7 +4,7 @@ pipeline {
     // Environment variables - customize these
     environment {
         // Docker configuration
-        DOCKER_HUB_REPO = 'your-dockerhub-username'  // Change this
+        DOCKER_HUB_REPO = 'eltumerabe'  // Change this
         IMAGE_NAME = 'hairstyle-user-service'
         IMAGE_TAG = "${BUILD_NUMBER}"
 
