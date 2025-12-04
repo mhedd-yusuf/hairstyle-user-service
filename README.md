@@ -275,3 +275,6 @@ For issues or questions, please check:
 ## License
 
 MIT
+
+## Note
+This code is generated with the help of Claude AI
